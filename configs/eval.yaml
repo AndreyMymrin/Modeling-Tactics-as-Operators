@@ -1,0 +1,12 @@
+# Evaluation config
+deltas_path: data/processed/deltas.jsonl
+
+device: cuda                                     # common sense
+ks: [1, 5, 10]                                  # common sense (paper uses retrieval metrics; exact ks can vary)
+max_examples: null                              # common sense; set integer for quick debug
+
+umap:
+  n_neighbors: 15                               # common sense (paper doesn't pin exact; UMAP defaults)
+  min_dist: 0.1                                 # common sense
+  metric: cosine                                # common sense
+  top_n_labels: 50                              # common sense

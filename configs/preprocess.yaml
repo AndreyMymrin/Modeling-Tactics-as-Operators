@@ -1,0 +1,21 @@
+# Preprocess toggles / normalization
+canonicalize:
+  unicode_nfkc: true                         # common sense
+  normalize_numbers: false                   # common sense (paper не фиксирует; оставить false)
+
+tokenize:
+  split_unicode_ops: true                    # common sense (реализовано в tokenize_state)
+
+alpha_rename:
+  enabled: true                              # common sense (в статье упоминается alpha-renaming как часть пайплайна)
+  prefix: "_x"                               # common sense
+
+goal_context:
+  marker: "⊢"                                # common sense (Lean pretty-print)
+
+tactic_head:
+  normalize_by_parser: true                  # common sense (extract_tactic_head)
+
+delta_context:
+  include_tok_deltas: true                   # common sense
+  include_typed_edits: true                  # common sense (paper сравнивает Tokens-only vs Full)

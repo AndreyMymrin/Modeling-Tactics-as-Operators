@@ -1,0 +1,27 @@
+method: sgns
+run_name: sgns_delta
+
+# Input
+dataset_path: data/processed/deltas.jsonl    # set by reproduce_paper.py as well
+
+# Compute
+device: cpu                                   # common sense (CPU default)
+seed: 0                                       # common sense
+
+# Model
+dim: 256                                      # original params (paper: d=256 for ∆-SGNS)
+cap_per_tactic: 5000                          # original params (paper: cap K=5000 steps per tactic)
+
+# Training
+epochs: 15                                    # original params (paper: 15 epochs)
+lr: 0.03                                      # original params (paper: learning rate 0.03)
+grad_clip_norm: 5.0                           # original params (paper: clip at norm 5.0)  (NOTE: trainer currently ignores; add later)
+
+batch_size: 4096                              # common sense (not in paper; speed/stability)
+neg_k: 15                                     # original params (paper: 15 negatives per positive for ∆-SGNS)
+unigram_power: 0.75                           # original params (paper: unigram^(3/4))
+unigram_table_size: 1000000                   # common sense (table size; not in paper)
+
+# Vocab thresholds
+min_count_context: 1                          # common sense
+min_count_tactic: 1                           # common sense

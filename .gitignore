@@ -1,0 +1,137 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# =========================
+# Jupyter / IPython
+# =========================
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# =========================
+# OS / Editors
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# =========================
+# Data (DO NOT COMMIT)
+# =========================
+data/raw/
+data/interim/
+data/processed/
+
+# Optional safety: keep dirs but ignore contents
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+
+# =========================
+# Results / outputs
+# =========================
+results/runs/
+results/figures/
+results/tables/
+
+# Optional safety
+!results/runs/.gitkeep
+!results/figures/.gitkeep
+!results/tables/.gitkeep
+
+# =========================
+# Logs / metrics
+# =========================
+*.log
+metrics.jsonl
+metrics_epoch_*.json
+checkpoint_epoch_*.pt
+model.pt
+
+# =========================
+# Lean / LeanDojo
+# =========================
+# Lean build artifacts
+.lake/
+lake-packages/
+lean_packages/
+*.olean
+
+# LeanDojo cache (VERY large)
+.cache/
+**/.cache/
+~/.cache/lean_dojo/
+
+# =========================
+# Datasets / archives
+# =========================
+*.tar
+*.tar.gz
+*.zip
+*.7z
+
+# =========================
+# HuggingFace datasets cache
+# =========================
+.hf_cache/
+**/datasets/
+
+# =========================
+# Temporary / scratch
+# =========================
+tmp/
+temp/
+scratch/
+*.tmp
+
+# =========================
+# Config overrides / secrets
+# =========================
+.env
+.env.local
+.env.*.local
+# =========================
+# Python tooling caches (WSL/Windows)
+# =========================
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+*.prof
+
+# HuggingFace caches
+**/.cache/huggingface/
+**/.cache/datasets/
+**/huggingface_hub_cache/
+
+# Windows junk
+$RECYCLE.BIN/
+*.lnk
+ehthumbs.db
+
+# VS Code Remote / WSL
+.vscode-server/

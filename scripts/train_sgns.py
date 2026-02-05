@@ -1,0 +1,37 @@
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+import yaml
+
+from eglt.paths import paths
+from eglt.utils.logging import setup_logging
+from eglt.utils.seed import set_seed
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Train ∆-SGNS (tactic -> delta contexts).")
+    ap.add_argument("--config", type=str, default="configs/train_sgns.yaml")
+    ap.add_argument("--seed", type=int, default=0)
+    args = ap.parse_args()
+
+    log = setup_logging()
+    set_seed(args.seed)
+    P = paths(Path.cwd())
+
+    cfg = yaml.safe_load((P.root / args.config).read_text(encoding="utf-8"))
+    log.info(f"Loaded config: {args.config}")
+
+    # Deferred import: you will implement this later
+    from eglt.training.trainer import train_sgns  # type: ignore
+
+    run_dir = P.results_runs / cfg.get("run_name", "sgns_run")
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    train_sgns(cfg=cfg, run_dir=run_dir)
+    log.info(f"Finished. Run dir: {run_dir}")
+
+
+if __name__ == "__main__":
+    main()

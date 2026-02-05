@@ -1,0 +1,13 @@
+# Dataset / paths / split
+raw_jsonl: data/raw/steps.jsonl              # <-- положи сюда исходный StepRecord JSONL (не коммитить)
+out_deltas_jsonl: data/processed/deltas.jsonl
+
+# Split protocol
+split:
+  by: proof_id
+  ratios: [0.8, 0.1, 0.1]                    # original params (paper: 80/10/10 by proof_id)
+  seed: 0                                    # common sense (fixed seed for reproducibility)
+  out_dir: data/processed/splits             # SPEC: data/processed/splits/*.txt
+
+# Optional: if хочешь делать splits без чтения полного raw корпуса
+# proof_ids_file: data/interim/proof_ids.txt

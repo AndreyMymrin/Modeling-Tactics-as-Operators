@@ -1,0 +1,21 @@
+method: seq
+run_name: seq_baseline
+
+# Input for seq baseline is StepRecord JSONL (raw steps), not deltas
+step_records_path: data/raw/steps.jsonl        # common sense; can be overridden
+
+device: cuda                                     # common sense
+seed: 0                                         # common sense
+
+dim: 128                                        # original params (paper: d=128 for sequence baseline)
+epochs: 15                                      # original params (paper: 15 epochs)
+lr: 0.03                                        # original params (paper: learning rate 0.03)
+grad_clip_norm: 5.0                             # original params (paper: clip norm 5.0) (NOTE: seq_baseline currently ignores)
+
+window: 4                                       # original params (paper: sequence baseline window w=4)
+batch_size: 8192                                # common sense (pair batching)
+
+neg_k: 10                                       # original params (paper: 10 negatives for seq baseline)
+unigram_power: 0.75                             # original params (paper: unigram^(3/4))
+unigram_table_size: 1000000                     # common sense
+min_count_tactic: 1                             # common sense
