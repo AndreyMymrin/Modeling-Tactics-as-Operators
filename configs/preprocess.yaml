@@ -9,6 +9,7 @@ tokenize:
 alpha_rename:
   enabled: true                              # common sense (в статье упоминается alpha-renaming как часть пайплайна)
   prefix: "_x"                               # common sense
+  shared_mapping: true                        # keep variable identity consistent across before/after states
 
 goal_context:
   marker: "⊢"                                # common sense (Lean pretty-print)

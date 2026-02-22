@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict
-from typing import List, Tuple
+from dataclasses import dataclass
 
 from eglt.dataset.schema import DeltaRecord, StepRecord
 from eglt.delta.token_delta import positive_token_deltas
@@ -11,6 +10,16 @@ from eglt.preprocess.canonicalize import canonicalize_tokens, canonicalize_text
 from eglt.preprocess.goal_context import split_context_goal
 from eglt.preprocess.tactic_head import extract_tactic_head
 from eglt.preprocess.tokenize import tokenize_state
+
+
+@dataclass(frozen=True)
+class BuildDeltaConfig:
+    normalize_numbers: bool = False
+    alpha_rename_enabled: bool = True
+    alpha_rename_prefix: str = "_x"
+    alpha_rename_shared_mapping: bool = True
+    include_tok_deltas: bool = True
+    include_typed_edits: bool = True
 
 
 def _get_raw_states(step: StepRecord) -> tuple[str | None, str | None]:
@@ -40,7 +49,7 @@ def _ensure_tokens(raw: str | None, fallback_tokens: list[str] | None) -> list[s
     return tokenize_state(raw)
 
 
-def build_delta_context(step: StepRecord) -> DeltaRecord:
+def build_delta_context(step: StepRecord, cfg: BuildDeltaConfig | None = None) -> DeltaRecord:
     """
     Build DeltaRecord for a single StepRecord.
 
@@ -69,31 +78,52 @@ def build_delta_context(step: StepRecord) -> DeltaRecord:
     >>> "∆ADD_HYP" in d.delta_context
     True
     """
+    cfg = cfg or BuildDeltaConfig()
     before_raw, after_raw = _get_raw_states(step)
 
     before_tokens = _ensure_tokens(before_raw, step.state_before_tokens)
     after_tokens = _ensure_tokens(after_raw, step.state_after_tokens)
 
-    before_tokens = canonicalize_tokens(before_tokens, normalize_numbers=False)
-    after_tokens = canonicalize_tokens(after_tokens, normalize_numbers=False)
+    before_tokens = canonicalize_tokens(before_tokens, normalize_numbers=cfg.normalize_numbers)
+    after_tokens = canonicalize_tokens(after_tokens, normalize_numbers=cfg.normalize_numbers)
 
     b_ctx, b_goal, _, _ = split_context_goal(before_tokens)
     a_ctx, a_goal, _, _ = split_context_goal(after_tokens)
 
-    # alpha-rename within each state independently (deterministic)
-    b_ctx_r, _ = alpha_rename(b_ctx)
-    a_ctx_r, _ = alpha_rename(a_ctx)
-    b_goal_r, _ = alpha_rename(b_goal)
-    a_goal_r, _ = alpha_rename(a_goal)
+    if cfg.alpha_rename_enabled:
+        if cfg.alpha_rename_shared_mapping:
+            joined, _ = alpha_rename(
+                b_ctx + b_goal + a_ctx + a_goal,
+                prefix=cfg.alpha_rename_prefix,
+            )
+            i = 0
+            b_ctx_r = joined[i:i + len(b_ctx)]
+            i += len(b_ctx)
+            b_goal_r = joined[i:i + len(b_goal)]
+            i += len(b_goal)
+            a_ctx_r = joined[i:i + len(a_ctx)]
+            i += len(a_ctx)
+            a_goal_r = joined[i:i + len(a_goal)]
+        else:
+            b_ctx_r, _ = alpha_rename(b_ctx, prefix=cfg.alpha_rename_prefix)
+            a_ctx_r, _ = alpha_rename(a_ctx, prefix=cfg.alpha_rename_prefix)
+            b_goal_r, _ = alpha_rename(b_goal, prefix=cfg.alpha_rename_prefix)
+            a_goal_r, _ = alpha_rename(a_goal, prefix=cfg.alpha_rename_prefix)
+    else:
+        b_ctx_r, b_goal_r, a_ctx_r, a_goal_r = b_ctx, b_goal, a_ctx, a_goal
 
-    tok_deltas = positive_token_deltas(b_ctx_r, a_ctx_r)
-    typed = extract_typed_edits(
-        before_raw=before_raw,
-        after_raw=after_raw,
-        before_ctx_tokens=b_ctx_r,
-        after_ctx_tokens=a_ctx_r,
-        before_goal_tokens=b_goal_r,
-        after_goal_tokens=a_goal_r,
+    tok_deltas = positive_token_deltas(b_ctx_r, a_ctx_r) if cfg.include_tok_deltas else []
+    typed = (
+        extract_typed_edits(
+            before_raw=before_raw,
+            after_raw=after_raw,
+            before_ctx_tokens=b_ctx_r,
+            after_ctx_tokens=a_ctx_r,
+            before_goal_tokens=b_goal_r,
+            after_goal_tokens=a_goal_r,
+        )
+        if cfg.include_typed_edits
+        else []
     )
 
     # Combine into multiset C: typed edits + TOK deltas (positive only)

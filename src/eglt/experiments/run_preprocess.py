@@ -7,10 +7,26 @@ import yaml
 from tqdm import tqdm
 
 from eglt.dataset.load_raw import load_step_records_jsonl
-from eglt.delta.build_context import build_delta_context
+from eglt.delta.build_context import BuildDeltaConfig, build_delta_context
 from eglt.paths import paths
 from eglt.utils.io import write_jsonl
 from eglt.utils.logging import setup_logging
+
+
+
+def _build_delta_cfg_from_yaml(preprocess_cfg: dict) -> BuildDeltaConfig:
+    canonicalize = preprocess_cfg.get("canonicalize", {})
+    alpha = preprocess_cfg.get("alpha_rename", {})
+    delta = preprocess_cfg.get("delta_context", {})
+
+    return BuildDeltaConfig(
+        normalize_numbers=bool(canonicalize.get("normalize_numbers", False)),
+        alpha_rename_enabled=bool(alpha.get("enabled", True)),
+        alpha_rename_prefix=str(alpha.get("prefix", "_x")),
+        alpha_rename_shared_mapping=bool(alpha.get("shared_mapping", True)),
+        include_tok_deltas=bool(delta.get("include_tok_deltas", True)),
+        include_typed_edits=bool(delta.get("include_typed_edits", True)),
+    )
 
 
 def run_preprocess(dataset_cfg: dict, preprocess_cfg: dict) -> Path:
@@ -22,8 +38,8 @@ def run_preprocess(dataset_cfg: dict, preprocess_cfg: dict) -> Path:
       - raw_jsonl: path under data/raw or absolute
       - out_deltas_jsonl: path under data/processed
 
-    preprocess_cfg is currently not consumed here directly because the core functions
-    are pure/heuristic; keep it for reproducibility + future toggles.
+    preprocess_cfg controls normalization / alpha-renaming / feature toggles
+    passed into build_delta_context.
     """
     log = setup_logging()
     P = paths(Path.cwd())
@@ -40,10 +56,12 @@ def run_preprocess(dataset_cfg: dict, preprocess_cfg: dict) -> Path:
     log.info(f"Reading raw JSONL: {raw_path}")
     records = list(load_step_records_jsonl(raw_path))
 
+    delta_cfg = _build_delta_cfg_from_yaml(preprocess_cfg)
+
     # Build deltas
     out_rows = []
     for r in tqdm(records, desc="build_delta_context"):
-        d = build_delta_context(r)
+        d = build_delta_context(r, cfg=delta_cfg)
         out_rows.append(d.to_dict())
 
     write_jsonl(out_path, out_rows)
