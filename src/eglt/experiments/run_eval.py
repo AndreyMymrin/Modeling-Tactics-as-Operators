@@ -40,7 +40,7 @@ def run_eval(cfg: dict, run_dir: str | Path) -> None:
         encoding="utf-8",
     )
     log.info(f"Retrieval: MRR={ret.mrr:.4f}, n={ret.n}")
-
+    """
     # Analogy (only uses examples with before/after states)
     an = evaluate_analogy(deltas_path, run_dir, ks=list(ks), device=device, max_examples=cfg.get("max_examples"))
     (run_dir / "eval_analogy.yaml").write_text(
@@ -50,7 +50,7 @@ def run_eval(cfg: dict, run_dir: str | Path) -> None:
         ),
         encoding="utf-8",
     )
-    log.info(f"Analogy: avg_cos={an.avg_cosine:.4f}, median_rank={an.median_rank:.1f}, n={an.n}")
+    log.info(f"Analogy: avg_cos={an.avg_cosine:.4f}, median_rank={an.median_rank:.1f}, n={an.n}")"""
 
     # UMAP Figure 1
     um = cfg.get("umap", {}) or {}
