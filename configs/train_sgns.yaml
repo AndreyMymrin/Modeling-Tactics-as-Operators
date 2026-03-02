@@ -13,7 +13,7 @@ dim: 256                                      # original params (paper: d=256 fo
 cap_per_tactic: 5000                          # original params (paper: cap K=5000 steps per tactic)
 
 # Training
-epochs: 15                                    # original params (paper: 15 epochs)
+epochs: 150                                    # original params (paper: 15 epochs)
 lr: 0.03                                      # original params (paper: learning rate 0.03)
 grad_clip_norm: 5.0                           # original params (paper: clip at norm 5.0)  (NOTE: trainer currently ignores; add later)
 
